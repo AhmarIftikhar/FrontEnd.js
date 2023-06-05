@@ -15,22 +15,32 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCubes } from "@fortawesome/free-solid-svg-icons";
 import { login, resetState, resetLoginState } from "../auth/randomSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 function LoginForm({ handleShow, handleShow1 }) {
   const { loginState, loginError, loginSuccess, loginLoading, loginErrMsg } =
     useSelector((state) => state.auth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const onSubmit = async (values, { setSubmitting }) => {
     const userData = {
-      email,
-      password,
+      email: values.email,
+      password: values.password,
     };
     await dispatch(login(userData));
+    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -76,37 +86,70 @@ function LoginForm({ handleShow, handleShow1 }) {
                 Login into your account
               </h5>
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-4">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    size="lg"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </Form.Group>
+              <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={onSubmit}
+              >
+                {({
+                  values,
+                  errors,
+                  touched,
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  isSubmitting,
+                }) => (
+                  <Form noValidate onSubmit={handleSubmit}>
+                    <Form.Group className="mb-4">
+                      <Form.Label>Email address</Form.Label>
+                      <Form.Control
+                        type="email"
+                        size="lg"
+                        name="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={touched.email && errors.email}
+                      />
+                      <ErrorMessage
+                        name="email"
+                        component="div"
+                        className="text-danger"
+                      />
+                    </Form.Group>
 
-                <Form.Group className="mb-4">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    size="lg"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </Form.Group>
+                    <Form.Group className="mb-4">
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        size="lg"
+                        name="password"
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={touched.password && errors.password}
+                      />
+                      <ErrorMessage
+                        name="password"
+                        component="div"
+                        className="text-danger"
+                      />
+                    </Form.Group>
 
-                <Button
-                  className="mb-4 px-5"
-                  style={{ width: "100%" }}
-                  variant="dark"
-                  size="lg"
-                  type="submit"
-                >
-                  Login
-                </Button>
-              </Form>
+                    <Button
+                      className="mb-4 px-5"
+                      style={{ width: "100%" }}
+                      variant="dark"
+                      size="lg"
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      Login
+                    </Button>
+                  </Form>
+                )}
+              </Formik>
               <Link className="small text-muted" onClick={handleShow}>
                 Forgot password?
               </Link>

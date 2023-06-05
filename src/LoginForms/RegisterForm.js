@@ -36,7 +36,7 @@ function RegisterForm() {
   };
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
       .required("Required"),
@@ -97,7 +97,7 @@ function RegisterForm() {
               handleSubmit,
               isSubmitting,
             }) => (
-              <Form onSubmit={handleSubmit}>
+              <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group className="mb-4">
                   <Form.Label>Email address</Form.Label>
                   <Form.Control
