@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCubes } from "@fortawesome/free-solid-svg-icons";
-import { login, resetState } from "../auth/randomSlice";
+import { login, resetState, resetLoginState } from "../auth/randomSlice";
 import { useDispatch, useSelector } from "react-redux";
 function LoginForm({ handleShow, handleShow1 }) {
   const { loginState, loginError, loginSuccess, loginLoading, loginErrMsg } =
@@ -39,6 +39,7 @@ function LoginForm({ handleShow, handleShow1 }) {
     } else if (loginSuccess) {
       toast.success(loginState?.message, { autoClose: 3000 });
       navigate("/productList");
+      dispatch(resetLoginState());
     } else if (loginError) {
       toast.error(loginErrMsg, { autoClose: 3000 });
       dispatch(resetState());

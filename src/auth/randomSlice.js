@@ -128,6 +128,9 @@ const randomSlice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
+    resetLoginState: (state) => {
+      state.loginSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -211,6 +214,6 @@ const randomSlice = createSlice({
   },
 });
 
-export const { resetState } = randomSlice.actions;
+export const { resetState, resetLoginState } = randomSlice.actions;
 
 export default randomSlice.reducer;
