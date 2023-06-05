@@ -1,16 +1,3 @@
-// import { combineReducers } from "redux";
-// // import authReducer from "../auth/authSlice";
-// import contextSlice from "../auth/contextSlice";
-// import randomSlice from "../auth/randomSlice";
-
-// const rootReducer = combineReducers({
-//   // user: authReducer,
-//   products: contextSlice,
-//   auth: randomSlice,
-// });
-
-// export default rootReducer;
-
 import { combineReducers } from "redux";
 import storage from "redux-persist/lib/storage";
 // slices
@@ -26,7 +13,6 @@ const rootPersistConfig = {
 };
 
 const rootReducer = combineReducers({
-  // user: authReducer,
   products: contextSlice,
   auth: randomSlice,
 });
