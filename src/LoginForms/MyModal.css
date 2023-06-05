@@ -1,0 +1,17 @@
+.close-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .close-icon {
+    color: #fff;
+    font-size: 1.5rem;
+  }
+  
+  .close-icon:hover {
+    color: #ccc;
+    cursor: pointer;
+  }
+  
