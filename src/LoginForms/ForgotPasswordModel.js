@@ -40,6 +40,7 @@ function ForgotPasswordModel({ show, handleClose, handleShow }) {
     } else if (forgotPasswordSuccess) {
       toast.success(forgotPasswordState?.message, { autoClose: 3000 });
       dispatch(resetState());
+      handleClose();
     } else if (forgotPasswordError) {
       toast.error(forgotPasswordErrMsg, { autoClose: 3000 });
       dispatch(resetState());
