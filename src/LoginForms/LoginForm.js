@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCubes } from "@fortawesome/free-solid-svg-icons";
 import { login, resetState, resetLoginState } from "../auth/randomSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 function LoginForm({ handleShow, handleShow1 }) {
   const { loginState, loginError, loginSuccess, loginLoading, loginErrMsg } =
@@ -112,11 +112,9 @@ function LoginForm({ handleShow, handleShow1 }) {
                         onBlur={handleBlur}
                         isInvalid={touched.email && errors.email}
                       />
-                      <ErrorMessage
-                        name="email"
-                        component="div"
-                        className="text-danger"
-                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.email}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-4">
@@ -130,11 +128,9 @@ function LoginForm({ handleShow, handleShow1 }) {
                         onBlur={handleBlur}
                         isInvalid={touched.password && errors.password}
                       />
-                      <ErrorMessage
-                        name="password"
-                        component="div"
-                        className="text-danger"
-                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.password}
+                      </Form.Control.Feedback>
                     </Form.Group>
 
                     <Button

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Modal, Form, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import { AiOutlineClose } from "react-icons/ai";
 import "./MyModal.css";
 import { resetPassword, resetState } from "../auth/randomSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
 function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
   const {
     resetPasswordState,
@@ -15,20 +18,30 @@ function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
     resetPasswordLoading,
     resetPasswordErrMsg,
   } = useSelector((state) => state.auth);
-  const [newPassword, setNewPassword] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = (event) => {
-    event.preventDefault();
+
+  const initialValues = {
+    newPassword: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    newPassword: Yup.string()
+      .required("New Password is required")
+      .min(8, "New Password must be at least 8 characters long"),
+  });
+
+  const handleSubmit = (values, { setSubmitting }) => {
     const token = localStorage.getItem("token");
     const userData = {
       token,
-      newPassword,
+      newPassword: values.newPassword,
     };
-
     dispatch(resetPassword(userData));
+    setSubmitting(false);
   };
+
   useEffect(() => {
     if (resetPasswordLoading) {
       toast.info("Loading...");
@@ -40,6 +53,7 @@ function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
       dispatch(resetState());
     }
   }, [resetPasswordLoading, resetPasswordError, resetPasswordSuccess]);
+
   return (
     <>
       <Modal show={show1} onHide={handleClose1} backdrop="static">
@@ -54,22 +68,47 @@ function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
             Enter your email address and we'll send you an email with
             instructions to reset your password.
           </p>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="email">New Password</label>
-              <input
-                type="password"
-                className="form-control"
-                id="newPassword"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Reset password
-            </button>
-          </form>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+            }) => (
+              <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group className="mb-4">
+                  <Form.Label>New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    size="lg"
+                    name="newPassword"
+                    placeholder="New Password"
+                    value={values.newPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    isInvalid={touched.newPassword && !!errors.newPassword}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.newPassword}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <Button
+                  type="submit"
+                  className="btn btn-primary w-100"
+                  disabled={isSubmitting}
+                >
+                  Reset Password
+                </Button>
+              </Form>
+            )}
+          </Formik>
           <div className="d-flex justify-content-between mt-4">
             <Link to="/" onClick={handleClose1}>
               Login
