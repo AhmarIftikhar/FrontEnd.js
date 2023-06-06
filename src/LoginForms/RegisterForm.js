@@ -15,7 +15,7 @@ import {
   InputGroup,
   FormControl,
 } from "react-bootstrap";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 
 function RegisterForm() {
@@ -109,11 +109,9 @@ function RegisterForm() {
                     onBlur={handleBlur}
                     isInvalid={touched.email && errors.email}
                   />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-danger"
-                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-4">
@@ -127,11 +125,9 @@ function RegisterForm() {
                     onBlur={handleBlur}
                     isInvalid={touched.password && errors.password}
                   />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-danger"
-                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.password}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
                 <Button
