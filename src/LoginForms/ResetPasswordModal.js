@@ -48,6 +48,7 @@ function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
     } else if (resetPasswordSuccess) {
       toast.success(resetPasswordState?.message, { autoClose: 3000 });
       dispatch(resetState());
+      handleClose1();
     } else if (resetPasswordError) {
       toast.error(resetPasswordErrMsg, { autoClose: 3000 });
       dispatch(resetState());
