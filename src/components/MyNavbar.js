@@ -53,10 +53,12 @@ function MyNavbar() {
     <>
       <Navbar bg="light" expand="lg" style={{ paddingBottom: "10px" }}>
         <Container fluid>
-          <Link to="/ProductList" className="nav-link">
-            {" "}
-            Product{" "}
-          </Link>
+          {isAuthenticated && (
+            <Link to="/ProductList" className="nav-link">
+              {" "}
+              Product{" "}
+            </Link>
+          )}
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav
