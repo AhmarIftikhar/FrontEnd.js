@@ -69,7 +69,7 @@ export const login = createAsyncThunk(
         password,
       });
       const token = response.data.token;
-      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("tokens", JSON.stringify(token));
 
       return response?.data;
     } catch (error) {
@@ -83,7 +83,7 @@ export const logout = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await client.post("/api/auth/logout", { userId });
-      localStorage.removeItem("token");
+      localStorage.removeItem("tokens");
       return response?.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
