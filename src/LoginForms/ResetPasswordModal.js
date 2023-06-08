@@ -33,7 +33,8 @@ function ResetPasswordModal({ show1, handleClose1, handleShow1 }) {
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
-    const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
+    const token = JSON.parse(localStorage.getItem("token"));
     const userData = {
       token,
       newPassword: values.newPassword,

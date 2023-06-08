@@ -99,7 +99,7 @@ export const forgotPassword = createAsyncThunk(
         email,
       });
       const { token, message } = forgetresponse.data;
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", JSON.stringify(token));
       return { token, message };
     } catch (error) {
       return rejectWithValue(error.response.data.message);
