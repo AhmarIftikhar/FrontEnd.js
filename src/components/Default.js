@@ -2,6 +2,8 @@ import React, { Component } from "react";
 
 export default class Default extends Component {
   render() {
+    const { pathname } = window.location;
+
     return (
       <div className="container">
         <div className="row">
@@ -10,9 +12,8 @@ export default class Default extends Component {
             <h1 className="display-3">404</h1>
             <h2>page not found</h2>
             <h3>
-              the requested URL
-              {""}
-              was not found
+              The requested URL <span className="text-danger">{pathname}</span>{" "}
+              was not found.
             </h3>
           </div>
         </div>
