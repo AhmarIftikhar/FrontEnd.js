@@ -13,6 +13,10 @@ import { ToastContainer, toast } from "react-toastify";
 import { RequireAuth } from "./LoginForms/RequireAuth";
 import ForgotPasswordModel from "./LoginForms/ForgotPasswordModel";
 import ResetPasswordModal from "./LoginForms/ResetPasswordModal";
+import TableData from "./TableData/tableData";
+import CreateTableData from "./TableData/createTableData";
+import EditTableData from "./TableData/editTableData";
+
 const App = () => {
   const [show, setShow] = useState(false);
   const [show1, setShow1] = useState(false);
@@ -59,6 +63,33 @@ const App = () => {
           element={
             <RequireAuth>
               <Cart />
+            </RequireAuth>
+          }
+        />
+        <Route
+          exact
+          path="/tableData"
+          element={
+            <RequireAuth>
+              <TableData />
+            </RequireAuth>
+          }
+        />
+        <Route
+          exact
+          path="/createTableData"
+          element={
+            <RequireAuth>
+              <CreateTableData />
+            </RequireAuth>
+          }
+        />
+        <Route
+          exact
+          path="/editTableData/:id"
+          element={
+            <RequireAuth>
+              <EditTableData />
             </RequireAuth>
           }
         />
