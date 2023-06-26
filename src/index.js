@@ -1,28 +1,28 @@
 import React from "react";
-
-import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
+
 import ReactDOM from "react-dom/client";
+
+import { persistStore } from "redux-persist";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+
 import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 
-import { Provider as ReduxProvider } from "react-redux";
-import { PersistGate } from "redux-persist/lib/integration/react";
-import { store, persistor } from "./store/store";
+import { store } from "./app/store/index";
+import { ServicesContextProvider } from "./app/context/ServicesContext";
+import App from "./app/App";
 
-window.addEventListener("beforeunload", () => {
-  localStorage.removeItem("toasterNotification");
-});
 const root = ReactDOM.createRoot(document.getElementById("root"));
+let persistor = persistStore(store);
+
 root.render(
-  <ReduxProvider store={store}>
+  <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <BrowserRouter>
+      <ServicesContextProvider>
         <App />
-      </BrowserRouter>
+      </ServicesContextProvider>
     </PersistGate>
-  </ReduxProvider>
+  </Provider>
 );
-reportWebVitals();
