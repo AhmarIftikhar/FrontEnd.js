@@ -154,12 +154,16 @@ const EditTableData = (props) => {
             <Form.Group controlId="status" className="mb-4">
               <Form.Label>Status</Form.Label>
               <Form.Control
-                type="text"
+                as="select"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
                 required
-              />
+              >
+                <option value="">Select status</option>
+                <option value="Active">Active</option>
+                <option value="InActive">InActive</option>
+              </Form.Control>
             </Form.Group>
 
             <Form.Group controlId="position" className="mb-4">

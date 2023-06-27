@@ -1,33 +1,59 @@
 import React, { useState } from "react";
+import { useFormik } from "formik";
+
 import { Form, Button, Card, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const client = axios.create({
-  baseURL: "http://localhost:3000",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
+import { Createtabledata } from "../../services/index";
+import show_Toast from "../../helpers/toast.helper";
+import { CreatetabledataScehma } from "../../validation/createtabledata";
+const initialValues = {
+  name: "",
+  email: "",
+  image: null,
+  title: "",
+  department: "",
+  status: "",
+  position: "",
+};
 const CreateTableData = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    image: "",
-    title: "",
-    department: "",
-    status: "",
-    position: "",
-  });
   const navigate = useNavigate();
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    isSubmitting,
+  } = useFormik({
+    initialValues,
+    validationSchema: CreatetabledataScehma,
+
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        setSubmitting(true);
+        const response = await Createtabledata(values);
+        if (response?.data?.success === true) {
+          navigate("/tableData");
+        }
+        show_Toast({
+          status: true,
+          message: response?.data?.message || "Success",
+        });
+        resetForm();
+      } catch (error) {
+        show_Toast({
+          status: false,
+          message: error?.response?.data?.message || "Something went wrong",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -35,71 +61,39 @@ const CreateTableData = () => {
     const maxSize = 4 * 1024 * 1024; // 4MB
     const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
-    if (file && file.size > maxSize) {
-      console.error("Image size exceeds the limit.");
-      return;
-    }
+    try {
+      if (!file) {
+        throw new Error("No image selected.");
+      }
 
-    const fileExtension = file.name
-      .substring(file.name.lastIndexOf("."))
-      .toLowerCase();
+      if (file.size > maxSize) {
+        throw new Error("Image size exceeds the limit.");
+      }
 
-    if (!allowedExtensions.includes(fileExtension)) {
-      console.error(
-        "Invalid file extension. Allowed extensions are .jpg, .jpeg, and .png."
-      );
-      return;
-    }
+      const fileExtension = file.name.toLowerCase();
 
-    reader.onloadend = () => {
-      setFormData((prevData) => ({
-        ...prevData,
-        image: reader.result,
-      }));
-    };
+      if (
+        !allowedExtensions.some((extension) =>
+          fileExtension.endsWith(extension)
+        )
+      ) {
+        throw new Error(
+          "Invalid file extension. Allowed extensions are .jpg, .jpeg, and .png."
+        );
+      }
 
-    if (file) {
+      reader.onloadend = () => {
+        setFieldValue("image", reader.result);
+      };
+
+      reader.onerror = (error) => {
+        throw new Error("Error occurred while reading the image file.");
+      };
+
       reader.readAsDataURL(file);
+    } catch (error) {
+      console.error(error.message);
     }
-  };
-
-  //   const handleImageChange = (event) => {
-  //     const file = event.target.files[0];
-  //     const reader = new FileReader();
-
-  //     const maxSize = 4 * 1024 * 1024; // 4MB
-
-  //     if (file && file.size > maxSize) {
-  //       // Handle image size exceeding the limit
-  //       console.error("Image size exceeds the limit.");
-  //       return;
-  //     }
-
-  //     reader.onloadend = () => {
-  //       setFormData((prevData) => ({
-  //         ...prevData,
-  //         image: reader.result,
-  //       }));
-  //     };
-
-  //     if (file) {
-  //       reader.readAsDataURL(file);
-  //     }
-  //   };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    client
-      .post("/api/auth/createtabledata", formData)
-      .then((response) => {
-        // Handle success response
-        console.log(response.data);
-        navigate("/tableData");
-      })
-      .catch((error) => {
-        // Handle error response
-        console.error(error);
-      });
   };
 
   return (
@@ -113,10 +107,16 @@ const CreateTableData = () => {
               <Form.Control
                 type="text"
                 name="name"
-                value={formData.name}
+                value={values.name}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.name && errors.name}
               />
+              {touched.name && errors.name && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="email" className="mb-4">
@@ -124,10 +124,16 @@ const CreateTableData = () => {
               <Form.Control
                 type="email"
                 name="email"
-                value={formData.email}
+                value={values.email}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.email && errors.email}
               />
+              {touched.email && errors.email && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.email}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="image" className="mb-4">
@@ -137,8 +143,14 @@ const CreateTableData = () => {
                 accept="image/*"
                 name="image"
                 onChange={handleImageChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.image && errors.image}
               />
+              {touched.image && errors.image && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.image}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="title" className="mb-4">
@@ -146,10 +158,16 @@ const CreateTableData = () => {
               <Form.Control
                 type="text"
                 name="title"
-                value={formData.title}
+                value={values.title}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.title && errors.title}
               />
+              {touched.title && errors.title && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.title}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="department" className="mb-4">
@@ -157,21 +175,37 @@ const CreateTableData = () => {
               <Form.Control
                 type="text"
                 name="department"
-                value={formData.department}
+                value={values.department}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.department && errors.department}
               />
+              {touched.department && errors.department && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.department}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="status" className="mb-4">
               <Form.Label>Status</Form.Label>
               <Form.Control
-                type="text"
+                as="select"
                 name="status"
-                value={formData.status}
+                value={values.status}
+                onBlur={handleBlur}
                 onChange={handleChange}
-                required
-              />
+                isInvalid={touched.status && errors.status}
+              >
+                <option value="">Select status</option>
+                <option value="Active">Active</option>
+                <option value="InActive">InActive</option>
+              </Form.Control>
+              {touched.status && errors.status && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.status}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="position" className="mb-4">
@@ -179,14 +213,26 @@ const CreateTableData = () => {
               <Form.Control
                 type="text"
                 name="position"
-                value={formData.position}
+                value={values.position}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.position && errors.position}
               />
+              {touched.position && errors.position && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.position}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <div className="d-grid">
-              <Button className="mb-4" variant="dark" size="lg" type="submit">
+              <Button
+                className="mb-4"
+                variant="dark"
+                size="lg"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 Submit
               </Button>
             </div>

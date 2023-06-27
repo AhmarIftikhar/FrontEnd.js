@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-const ProtectRedirectTo = "/login";
+const ProtectRedirectTo = "/";
 
 const AuthRedirectTo = "/productList";
 
