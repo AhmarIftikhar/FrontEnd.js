@@ -17,6 +17,7 @@ import { AuthRoute, ProtectedRoute } from "./routes";
 import Modal from "../components/Modal";
 import ForgotPasswordModel from "../containers/auth/forgotPassword/ForgotPasswordModel";
 import ResetPasswordModal from "../containers/auth/resetPassword/ResetPasswordModal";
+import Home from "../components/Section/Home";
 const AppRoutes = () => {
   const { isAuthenticated = false } = useSelector((state) => state.login);
 
@@ -35,7 +36,9 @@ const AppRoutes = () => {
           path="/login"
           element={
             <AuthRoute isAuthenticated={isAuthenticated}>
-              <LoginForm />
+              <AppLayout>
+                <LoginForm />
+              </AppLayout>
             </AuthRoute>
           }
         />
@@ -43,7 +46,19 @@ const AppRoutes = () => {
           path="/register"
           element={
             <AuthRoute isAuthenticated={isAuthenticated}>
-              <RegisterForm />
+              <AppLayout>
+                <RegisterForm />
+              </AppLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <AuthRoute isAuthenticated={isAuthenticated}>
+              <AppLayout>
+                <Home />
+              </AppLayout>
             </AuthRoute>
           }
         />

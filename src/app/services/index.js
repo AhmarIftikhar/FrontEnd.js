@@ -1,9 +1,12 @@
 import httpRequest from "../axios/index";
 
-import { LOGIN_ENDPOINT, REGISTER_ENDPOINT } from "../constant/apiEndPoints";
+import {
+  CREATETABLEDATA_ENDPOINT,
+  REGISTER_ENDPOINT,
+} from "../constant/apiEndPoints";
 
-export const LoginUser = (values) => {
-  return httpRequest.post(LOGIN_ENDPOINT, values);
+export const Createtabledata = (values) => {
+  return httpRequest.post(CREATETABLEDATA_ENDPOINT, values);
 };
 
 export const RegisterUser = (values) => {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../containers/auth/register/RegisterForm.css";
+import "../../containers/auth/register/RegisterForm.css";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ButtonContainer } from "./Button";
+import { ButtonContainer } from "../Button";
 import {
   Button,
   Container,
@@ -12,12 +12,12 @@ import {
   Navbar,
   NavDropdown,
 } from "react-bootstrap";
-import { resetProduct } from "../store/slices/contextSlice";
+import { resetProduct } from "../../store/slices/contextSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, resetState } from "../store/slices/randomSlice";
-import { setLoginStateEmpty } from "../store/slices/login";
+import { logout, resetState } from "../../store/slices/randomSlice";
+import { setLoginStateEmpty } from "../../store/slices/login";
 
-function MyNavbar() {
+function HeaderNavbar() {
   const {
     logoutLoading,
     logoutState,
@@ -41,7 +41,6 @@ function MyNavbar() {
       toast.info("Loading...");
     } else if (logoutSuccess) {
       toast.success(logoutState?.message, { autoClose: 3000 });
-      navigate("/login");
     } else if (logoutError) {
       toast.error(logoutErrMsg?.message, { autoClose: 3000 });
     }
@@ -51,10 +50,21 @@ function MyNavbar() {
     <>
       <Navbar bg="light" expand="lg" style={{ paddingBottom: "10px" }}>
         <Container fluid>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <Link to="/ProductList" className="nav-link">
               {" "}
-              Product{" "}
+              Product Shop{" "}
+            </Link>
+          ) : (
+            <Link to="" className="nav-link">
+              {" "}
+              Mobile App{" "}
+            </Link>
+          )}
+          {!isAuthenticated && (
+            <Link to="/" className="nav-link">
+              {" "}
+              Home{" "}
             </Link>
           )}
           {isAuthenticated && (
@@ -84,10 +94,14 @@ function MyNavbar() {
                   </ButtonContainer>
                 </Link>
               )}
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <Button variant="outline-success" onClick={handleLogout}>
                   Logout
                 </Button>
+              ) : (
+                <Link to="/login" className="btn btn-outline-success">
+                  Create Account
+                </Link>
               )}
             </Nav>
           </Navbar.Collapse>
@@ -97,4 +111,4 @@ function MyNavbar() {
   );
 }
 
-export default MyNavbar;
+export default HeaderNavbar;
