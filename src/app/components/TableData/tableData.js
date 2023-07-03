@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, Container, Table } from "react-bootstrap";
-import axios from "axios";
+import { Badge, Container, Table } from "react-bootstrap";
+import { Tabledata } from "../../services/index";
+import show_Toast from "../../helpers/toast.helper";
 import { Link } from "react-router-dom";
-
-const client = axios.create({
-  baseURL: "http://localhost:3000",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
 export default function TableData() {
   const [tableData, setTableData] = useState([]);
@@ -19,11 +13,18 @@ export default function TableData() {
 
   const fetchTableData = async () => {
     try {
-      const response = await client.get("/api/auth/tabledata");
-      const data = response.data;
-      setTableData(data.tableData);
+      const response = await Tabledata();
+      const data = response?.data?.tableData;
+      setTableData(data);
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
     } catch (error) {
-      console.log("Error:", error.message);
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
     }
   };
 
