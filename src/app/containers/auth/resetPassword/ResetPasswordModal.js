@@ -1,64 +1,48 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 import { AiOutlineClose } from "react-icons/ai";
 import "./MyModal.css";
-import { resetPassword, resetState } from "../../../store/slices/randomSlice";
+import { ResetPassword } from "../../../services/index";
+import show_Toast from "../../../helpers/toast.helper";
+import { ResetPasswordScehma } from "../../../validation/resetpassword";
 import { ServicesContext } from "../../../context/ServicesContext";
-
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Formik } from "formik";
-import * as Yup from "yup";
 
 function ResetPasswordModal() {
   const context = useContext(ServicesContext);
   const { show1, handleClose1 } = context;
-  const {
-    resetPasswordState,
-    resetPasswordError,
-    resetPasswordSuccess,
-    resetPasswordLoading,
-    resetPasswordErrMsg,
-  } = useSelector((state) => state.auth);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const initialValues = {
     newPassword: "",
   };
-
-  const validationSchema = Yup.object().shape({
-    newPassword: Yup.string()
-      .required("New Password is required")
-      .min(8, "New Password must be at least 8 characters long"),
-  });
-
-  const handleSubmit = (values, { setSubmitting }) => {
-    // const token = localStorage.getItem("token");
-    const token = JSON.parse(localStorage.getItem("token"));
-    const userData = {
-      token,
-      newPassword: values.newPassword,
-    };
-    dispatch(resetPassword(userData));
-    setSubmitting(false);
-  };
-
-  useEffect(() => {
-    if (resetPasswordLoading) {
-      toast.info("Loading...");
-    } else if (resetPasswordSuccess) {
-      toast.success(resetPasswordState?.message, { autoClose: 3000 });
-      dispatch(resetState());
-      handleClose1();
-    } else if (resetPasswordError) {
-      toast.error(resetPasswordErrMsg, { autoClose: 3000 });
-      dispatch(resetState());
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      setSubmitting(true);
+      const token = JSON.parse(localStorage.getItem("token"));
+      const payload = {
+        newPassword: values.newPassword,
+        token: token,
+      };
+      const response = await ResetPassword(payload);
+      if (response?.data?.success === true) {
+        localStorage.removeItem("token");
+        handleClose1();
+      }
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+      resetForm();
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setSubmitting(false);
     }
-  }, [resetPasswordLoading, resetPasswordError, resetPasswordSuccess]);
+  };
 
   return (
     <>
@@ -76,7 +60,7 @@ function ResetPasswordModal() {
           </p>
           <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            validationSchema={ResetPasswordScehma}
             onSubmit={handleSubmit}
           >
             {({

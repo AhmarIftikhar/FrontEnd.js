@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   Button,
   Container,
@@ -13,19 +11,15 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCubes } from "@fortawesome/free-solid-svg-icons";
-import {
-  login,
-  resetState,
-  resetLoginState,
-} from "../../../store/slices/randomSlice";
+import { LoginUser } from "../../../services/index";
+import show_Toast from "../../../helpers/toast.helper";
+import { LoginUserScehma } from "../../../validation/loginform";
 import { setIsAuthenticated, setUser } from "../../../store/slices/login";
 import { ServicesContext } from "../../../context/ServicesContext";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Formik } from "formik";
-import * as Yup from "yup";
+
 function LoginForm() {
-  const { loginState, loginError, loginSuccess, loginLoading, loginErrMsg } =
-    useSelector((state) => state.auth);
   const context = useContext(ServicesContext);
   const { handleShow, handleShow1 } = context;
   const dispatch = useDispatch();
@@ -36,33 +30,33 @@ function LoginForm() {
     password: "",
   };
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
-
-  const onSubmit = async (values, { setSubmitting }) => {
-    const userData = {
-      email: values.email,
-      password: values.password,
-    };
-    await dispatch(login(userData));
-    setSubmitting(false);
-  };
-
-  useEffect(() => {
-    if (loginLoading) {
-      toast.info("Loading...");
-    } else if (loginSuccess) {
-      toast.success(loginState?.message, { autoClose: 3000 });
-      navigate("/productList");
-      dispatch(resetLoginState());
-      dispatch(setIsAuthenticated(true));
-    } else if (loginError) {
-      toast.error(loginErrMsg, { autoClose: 3000 });
-      dispatch(resetState());
+  const onSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      setSubmitting(true);
+      const response = await LoginUser(values);
+      if (response?.data?.success === true) {
+        dispatch(setUser(response?.data?.user));
+        dispatch(setIsAuthenticated(true));
+        localStorage.setItem(
+          "accessToken",
+          JSON.stringify(response?.data?.token)
+        );
+        navigate("/productList");
+      }
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+      resetForm();
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setSubmitting(false);
     }
-  }, [loginLoading, loginError, loginSuccess]);
+  };
 
   return (
     <Container className="my-5">
@@ -96,7 +90,7 @@ function LoginForm() {
 
               <Formik
                 initialValues={initialValues}
-                validationSchema={validationSchema}
+                validationSchema={LoginUserScehma}
                 onSubmit={onSubmit}
               >
                 {({

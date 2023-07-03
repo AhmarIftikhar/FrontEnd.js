@@ -5,7 +5,6 @@ import Title from "./Title";
 
 const ProductList = () => {
   const { products } = useSelector((state) => state.products);
-  console.log("products", products);
   return (
     <React.Fragment>
       <div className="py-5">

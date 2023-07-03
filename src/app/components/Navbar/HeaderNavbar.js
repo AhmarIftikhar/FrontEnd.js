@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "../../containers/auth/register/RegisterForm.css";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 import { ButtonContainer } from "../Button";
 import {
   Button,
@@ -14,37 +12,38 @@ import {
 } from "react-bootstrap";
 import { resetProduct } from "../../store/slices/contextSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, resetState } from "../../store/slices/randomSlice";
 import { setLoginStateEmpty } from "../../store/slices/login";
+import show_Toast from "../../helpers/toast.helper";
+import httpRequest from "../../axios/index";
 
 function HeaderNavbar() {
-  const {
-    logoutLoading,
-    logoutState,
-    logoutError,
-    logoutSuccess,
-    logoutErrMsg,
-    isAuthenticated,
-  } = useSelector((state) => state.auth);
+  const { isAuthenticated = false } = useSelector((state) => state.login);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await dispatch(logout(logoutState.id));
-    await dispatch(resetState());
-    await dispatch(resetProduct());
-    await dispatch(setLoginStateEmpty());
-  };
-  useEffect(() => {
-    if (logoutLoading) {
-      toast.info("Loading...");
-    } else if (logoutSuccess) {
-      toast.success(logoutState?.message, { autoClose: 3000 });
-    } else if (logoutError) {
-      toast.error(logoutErrMsg?.message, { autoClose: 3000 });
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const payload = {
+        userId: user._id,
+      };
+      const response = await httpRequest.post("/api/auth/logout", payload);
+      if (response?.data?.success === true) {
+        dispatch(resetProduct());
+        dispatch(setLoginStateEmpty());
+        localStorage.removeItem("accessToken");
+      }
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
     }
-  }, [logoutLoading, logoutError, logoutSuccess]);
+  };
 
   return (
     <>
