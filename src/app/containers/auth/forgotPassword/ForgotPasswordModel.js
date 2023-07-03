@@ -1,55 +1,44 @@
-import React, { useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { Modal, Form, Button } from "react-bootstrap";
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { forgotPassword, resetState } from "../../../store/slices/randomSlice";
+import { ForgotPassword } from "../../../services/index";
+import show_Toast from "../../../helpers/toast.helper";
+import { ForgotPasswordScehma } from "../../../validation/forgotpassword";
 import { ServicesContext } from "../../../context/ServicesContext";
 
 import { Formik } from "formik";
-import * as Yup from "yup";
 
 function ForgotPasswordModel() {
   const context = useContext(ServicesContext);
   const { show, handleClose } = context;
-  const {
-    forgotPasswordState,
-    forgotPasswordError,
-    forgotPasswordSuccess,
-    forgotPasswordLoading,
-    forgotPasswordErrMsg,
-  } = useSelector((state) => state.auth);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const initialValues = {
     email: "",
   };
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-  });
-
-  const handleSubmit = (values, { setSubmitting }) => {
-    dispatch(forgotPassword(values.email));
-    setSubmitting(false);
-  };
-
-  useEffect(() => {
-    if (forgotPasswordLoading) {
-      toast.info("Loading...");
-    } else if (forgotPasswordSuccess) {
-      toast.success(forgotPasswordState?.message, { autoClose: 3000 });
-      dispatch(resetState());
-      handleClose();
-    } else if (forgotPasswordError) {
-      toast.error(forgotPasswordErrMsg, { autoClose: 3000 });
-      dispatch(resetState());
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      setSubmitting(true);
+      const response = await ForgotPassword(values);
+      if (response?.data?.success === true) {
+        localStorage.setItem("token", JSON.stringify(response?.data?.token));
+        handleClose();
+      }
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+      resetForm();
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setSubmitting(false);
     }
-  }, [forgotPasswordLoading, forgotPasswordError, forgotPasswordSuccess]);
+  };
 
   return (
     <>
@@ -67,7 +56,7 @@ function ForgotPasswordModel() {
           </p>
           <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            validationSchema={ForgotPasswordScehma}
             onSubmit={handleSubmit}
           >
             {({

@@ -1,33 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./RegisterForm.css";
-import { register, resetState } from "../../../store/slices/randomSlice";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Card,
-  Row,
-  Col,
-  Form,
-  Button,
-  InputGroup,
-  FormControl,
-} from "react-bootstrap";
+import { RegisterUser } from "../../../services/index";
+import show_Toast from "../../../helpers/toast.helper";
+import { RegisterUserScehma } from "../../../validation/registerform";
+import { Container, Card, Form, Button } from "react-bootstrap";
 import { Formik } from "formik";
-import * as Yup from "yup";
 
 function RegisterForm() {
-  const {
-    registerState,
-    registerError,
-    registerSuccess,
-    registerLoading,
-    registerErrMsg,
-  } = useSelector((state) => state.auth);
-
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const initialValues = {
@@ -35,37 +15,28 @@ function RegisterForm() {
     password: "",
   };
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Invalid email")
-      .matches(/^[^@]+@gmail\.com$/, "Email must end with gmail.com")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .required("Required"),
-  });
-
-  const onSubmit = async (values, { setSubmitting }) => {
-    const userData = {
-      email: values.email,
-      password: values.password,
-    };
-    await dispatch(register(userData));
-    setSubmitting(false);
-  };
-  useEffect(() => {
-    if (registerLoading) {
-      toast.info("Loading...");
-    } else if (registerSuccess) {
-      toast.success(registerState?.message, { autoClose: 3000 });
-      dispatch(resetState());
-
-      navigate("/login");
-    } else if (registerError) {
-      toast.error(registerErrMsg, { autoClose: 3000 });
-      dispatch(resetState());
+  const onSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      setSubmitting(true);
+      const response = await RegisterUser(values);
+      if (response?.data?.success === true) {
+        navigate("/login");
+      }
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+      resetForm();
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setSubmitting(false);
     }
-  }, [registerLoading, registerError, registerSuccess]);
+  };
+
   return (
     <Container fluid>
       <div
@@ -88,7 +59,7 @@ function RegisterForm() {
           <h2 className="fw-bold mb-5">Register now</h2>
           <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            validationSchema={RegisterUserScehma}
             onSubmit={onSubmit}
           >
             {({
