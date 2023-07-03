@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useFormik } from "formik";
+
 import { Form, Button, Card, Container } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import show_Toast from "../../helpers/toast.helper";
+import { EdittabledataScehma } from "../../validation/edittabledata";
+import httpRequest from "../../axios/index";
+const initialValues = {
+  name: "",
+  email: "",
+  image: null,
+  title: "",
+  department: "",
+  status: "",
+  position: "",
+};
 
-const client = axios.create({
-  baseURL: "http://localhost:3000",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-const EditTableData = (props) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    image: "",
-    title: "",
-    department: "",
-    status: "",
-    position: "",
-  });
+const EditTableData = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -29,71 +26,102 @@ const EditTableData = (props) => {
 
   const fetchTableData = async () => {
     try {
-      const response = await client.get(`/api/auth/tabledata/${id}`);
+      const response = await httpRequest.get(`/api/auth/tabledata/${id}`);
       const data = response.data.data;
-      console.log(data);
-      setFormData({
-        name: data.name,
-        email: data.email,
-        image: data.image,
-        title: data.title,
-        department: data.department,
-        status: data.status,
-        position: data.position,
-      });
+      setValues(data);
     } catch (error) {
-      console.log("Error:", error.message);
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
     }
   };
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    setValues,
+    isSubmitting,
+  } = useFormik({
+    initialValues,
+    validationSchema: EdittabledataScehma,
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        setSubmitting(true);
+        const response = await httpRequest.put(
+          `/api/auth/edittabledata/${id}`,
+          values
+        );
+        if (response?.data?.success === true) {
+          navigate("/tableData");
+        }
+        show_Toast({
+          status: true,
+          message: response?.data?.message || "Success",
+        });
+        resetForm();
+      } catch (error) {
+        show_Toast({
+          status: false,
+          message: error?.response?.data?.message || "Something went wrong",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
 
     const maxSize = 4 * 1024 * 1024; // 4MB
+    const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
-    if (file && file.size > maxSize) {
-      console.error("Image size exceeds the limit.");
-      return;
-    }
+    try {
+      if (!file) {
+        throw new Error("No image selected.");
+      }
 
-    reader.onloadend = () => {
-      setFormData((prevData) => ({
-        ...prevData,
-        image: reader.result,
-      }));
-    };
+      if (file.size > maxSize) {
+        throw new Error("Image size exceeds the limit.");
+      }
 
-    if (file) {
+      const fileExtension = file.name.toLowerCase();
+
+      if (
+        !allowedExtensions.some((extension) =>
+          fileExtension.endsWith(extension)
+        )
+      ) {
+        throw new Error(
+          "Invalid file extension. Allowed extensions are .jpg, .jpeg, and .png."
+        );
+      }
+
+      reader.onloadend = () => {
+        setFieldValue("image", reader.result);
+      };
+
+      reader.onerror = (error) => {
+        throw new Error("Error occurred while reading the image file.");
+      };
+
       reader.readAsDataURL(file);
+    } catch (error) {
+      console.error(error.message);
     }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    client
-      .put(`/api/auth/edittabledata/${id}`, formData)
-      .then((response) => {
-        console.log(response.data);
-        navigate("/tableData");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
   };
 
   return (
     <Container className="d-flex align-items-center justify-content-center">
       <Card style={{ maxWidth: "1000px", width: "100%" }}>
-        <Card.Header>Edit Table Data</Card.Header>
+        <Card.Header>Create Table Data</Card.Header>
         <Card.Body className="d-flex flex-column">
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="name" className="mb-4">
@@ -101,10 +129,16 @@ const EditTableData = (props) => {
               <Form.Control
                 type="text"
                 name="name"
-                value={formData.name}
+                value={values.name}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.name && errors.name}
               />
+              {touched.name && errors.name && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="email" className="mb-4">
@@ -112,10 +146,16 @@ const EditTableData = (props) => {
               <Form.Control
                 type="email"
                 name="email"
-                value={formData.email}
+                value={values.email}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.email && errors.email}
               />
+              {touched.email && errors.email && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.email}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="image" className="mb-4">
@@ -125,8 +165,14 @@ const EditTableData = (props) => {
                 accept="image/*"
                 name="image"
                 onChange={handleImageChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.image && errors.image}
               />
+              {touched.image && errors.image && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.image}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="title" className="mb-4">
@@ -134,10 +180,16 @@ const EditTableData = (props) => {
               <Form.Control
                 type="text"
                 name="title"
-                value={formData.title}
+                value={values.title}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.title && errors.title}
               />
+              {touched.title && errors.title && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.title}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="department" className="mb-4">
@@ -145,10 +197,16 @@ const EditTableData = (props) => {
               <Form.Control
                 type="text"
                 name="department"
-                value={formData.department}
+                value={values.department}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.department && errors.department}
               />
+              {touched.department && errors.department && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.department}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="status" className="mb-4">
@@ -156,14 +214,20 @@ const EditTableData = (props) => {
               <Form.Control
                 as="select"
                 name="status"
-                value={formData.status}
+                value={values.status}
+                onBlur={handleBlur}
                 onChange={handleChange}
-                required
+                isInvalid={touched.status && errors.status}
               >
                 <option value="">Select status</option>
                 <option value="Active">Active</option>
                 <option value="InActive">InActive</option>
               </Form.Control>
+              {touched.status && errors.status && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.status}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <Form.Group controlId="position" className="mb-4">
@@ -171,14 +235,26 @@ const EditTableData = (props) => {
               <Form.Control
                 type="text"
                 name="position"
-                value={formData.position}
+                value={values.position}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
+                isInvalid={touched.position && errors.position}
               />
+              {touched.position && errors.position && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.position}
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
 
             <div className="d-grid">
-              <Button className="mb-4" variant="dark" size="lg" type="submit">
+              <Button
+                className="mb-4"
+                variant="dark"
+                size="lg"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 Submit
               </Button>
             </div>
