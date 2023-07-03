@@ -2,19 +2,12 @@ import React from "react";
 import "../../containers/auth/register/RegisterForm.css";
 import { Link } from "react-router-dom";
 import { ButtonContainer } from "../Button";
-import {
-  Button,
-  Container,
-  Form,
-  Nav,
-  Navbar,
-  NavDropdown,
-} from "react-bootstrap";
+import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { resetProduct } from "../../store/slices/contextSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoginStateEmpty } from "../../store/slices/login";
 import show_Toast from "../../helpers/toast.helper";
-import httpRequest from "../../axios/index";
+import { Logout } from "../../services/index";
 
 function HeaderNavbar() {
   const { isAuthenticated = false } = useSelector((state) => state.login);
@@ -27,7 +20,7 @@ function HeaderNavbar() {
       const payload = {
         userId: user._id,
       };
-      const response = await httpRequest.post("/api/auth/logout", payload);
+      const response = await Logout(payload);
       if (response?.data?.success === true) {
         dispatch(resetProduct());
         dispatch(setLoginStateEmpty());

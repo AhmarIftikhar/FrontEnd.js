@@ -7,6 +7,7 @@ import {
   LOGIN_ENDPOINT,
   FORGOTPASSWORD_ENDPOINT,
   RESETPASSWORD_ENDPOINT,
+  LOGOUT_ENDPOINT,
 } from "../constant/apiEndPoints";
 
 export const RegisterUser = (values) => {
@@ -17,6 +18,9 @@ export const LoginUser = (values) => {
 };
 export const ForgotPassword = (values) => {
   return httpRequest.post(FORGOTPASSWORD_ENDPOINT, values);
+};
+export const Logout = (values) => {
+  return httpRequest.post(LOGOUT_ENDPOINT, values);
 };
 export const ResetPassword = (values) => {
   return httpRequest.post(RESETPASSWORD_ENDPOINT, values);
