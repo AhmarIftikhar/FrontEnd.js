@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Container, Table } from "react-bootstrap";
+import { Badge, Container, Table, Button } from "react-bootstrap";
 import { Tabledata } from "../../services/index";
 import show_Toast from "../../helpers/toast.helper";
 import { Link } from "react-router-dom";
+import { FaTrashAlt, FaPencilAlt } from "react-icons/fa";
+import httpRequest from "../../axios/index";
 
 export default function TableData() {
   const [tableData, setTableData] = useState([]);
-
   useEffect(() => {
     fetchTableData();
   }, []);
@@ -16,6 +17,22 @@ export default function TableData() {
       const response = await Tabledata();
       const data = response?.data?.tableData;
       setTableData(data);
+      show_Toast({
+        status: true,
+        message: response?.data?.message || "Success",
+      });
+    } catch (error) {
+      show_Toast({
+        status: false,
+        message: error?.response?.data?.message || "Something went wrong",
+      });
+    }
+  };
+  const handleDelete = async (id) => {
+    try {
+      const response = await httpRequest.delete(`/api/auth/deletetable/${id}`);
+      setTableData((prevData) => prevData.filter((item) => item._id !== id));
+
       show_Toast({
         status: true,
         message: response?.data?.message || "Success",
@@ -38,6 +55,7 @@ export default function TableData() {
             <th>Status</th>
             <th>Position</th>
             <th>Actions</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -76,8 +94,20 @@ export default function TableData() {
                     textDecoration: "none",
                   }}
                 >
-                  Edit
+                  <FaPencilAlt className="edit-icon" />
                 </Link>
+              </td>
+              <td>
+                <Button
+                  variant="link"
+                  size="sm"
+                  style={{
+                    textDecoration: "none",
+                  }}
+                  onClick={() => handleDelete(row._id)}
+                >
+                  <FaTrashAlt className="delete-icon" />
+                </Button>
               </td>
             </tr>
           ))}
