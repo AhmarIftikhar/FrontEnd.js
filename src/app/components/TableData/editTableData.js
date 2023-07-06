@@ -1,11 +1,35 @@
 import React, { useEffect } from "react";
 import { useFormik } from "formik";
+import { FaTimes } from "react-icons/fa";
 
 import { Form, Button, Card, Container } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import show_Toast from "../../helpers/toast.helper";
 import { EdittabledataScehma } from "../../validation/edittabledata";
 import httpRequest from "../../axios/index";
+import axios from "axios";
+
+const uploadToCloudinary = async (imageFile) => {
+  const cloudName = process.env.REACT_APP_CLOUD_NAME;
+  const uploadPreset = process.env.REACT_APP_UPLOAD_PRESET;
+
+  const formData = new FormData();
+  formData.append("file", imageFile);
+  formData.append("upload_preset", uploadPreset);
+
+  const response = await axios.post(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    formData
+  );
+
+  if (response.status === 200) {
+    const data = response.data;
+    return data;
+  } else {
+    throw new Error("Image upload to Cloudinary failed.");
+  }
+};
+
 const initialValues = {
   name: "",
   email: "",
@@ -53,6 +77,10 @@ const EditTableData = () => {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
         setSubmitting(true);
+        const cloudinaryResponse = await uploadToCloudinary(values.image);
+        const imageUrl = cloudinaryResponse.secure_url;
+
+        values.image = imageUrl;
         const response = await httpRequest.put(
           `/api/auth/edittabledata/${id}`,
           values
@@ -117,6 +145,9 @@ const EditTableData = () => {
       console.error(error.message);
     }
   };
+  const handleRemoveImage = () => {
+    setFieldValue("image", null);
+  };
 
   return (
     <Container className="d-flex align-items-center justify-content-center">
@@ -168,6 +199,20 @@ const EditTableData = () => {
                 onBlur={handleBlur}
                 isInvalid={touched.image && errors.image}
               />
+              {values.image && (
+                <div className="d-flex align-items-center">
+                  <img
+                    src={values.image}
+                    alt="Selected"
+                    style={{ maxWidth: "200px", marginTop: "10px" }}
+                  />
+                  <FaTimes
+                    className="ml-2"
+                    onClick={handleRemoveImage}
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              )}
               {touched.image && errors.image && (
                 <Form.Control.Feedback type="invalid">
                   {errors.image}
