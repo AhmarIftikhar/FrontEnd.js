@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
 import { FaTimes } from "react-icons/fa";
+import { Helmet } from "react-helmet-async";
 
 import { Form, Button, Card, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -132,163 +133,169 @@ const CreateTableData = () => {
     setFieldValue("image", null);
   };
   return (
-    <Container className="d-flex align-items-center justify-content-center">
-      <Card style={{ maxWidth: "1000px", width: "100%" }}>
-        <Card.Header>Create Table Data</Card.Header>
-        <Card.Body className="d-flex flex-column">
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="name" className="mb-4">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched.name && errors.name}
-              />
-              {touched.name && errors.name && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.name}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+    <>
+      {" "}
+      <Helmet>
+        <title> Dashboard | CreateTableData </title>
+      </Helmet>
+      <Container className="d-flex align-items-center justify-content-center">
+        <Card style={{ maxWidth: "1000px", width: "100%" }}>
+          <Card.Header>Create Table Data</Card.Header>
+          <Card.Body className="d-flex flex-column">
+            <Form onSubmit={handleSubmit}>
+              <Form.Group controlId="name" className="mb-4">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.name && errors.name}
+                />
+                {touched.name && errors.name && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.name}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="email" className="mb-4">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched.email && errors.email}
-              />
-              {touched.email && errors.email && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.email}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="email" className="mb-4">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.email && errors.email}
+                />
+                {touched.email && errors.email && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="image" className="mb-4">
-              <Form.Label>Image</Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                name="image"
-                onChange={handleImageChange}
-                onBlur={handleBlur}
-                isInvalid={touched.image && errors.image}
-              />
-              {values.image && (
-                <div className="d-flex align-items-center">
-                  <img
-                    src={values.image}
-                    alt="Selected"
-                    style={{ maxWidth: "200px", marginTop: "10px" }}
-                  />
-                  <FaTimes
-                    className="ml-2"
-                    onClick={handleRemoveImage}
-                    style={{ cursor: "pointer" }}
-                  />
-                </div>
-              )}
-              {touched.image && errors.image && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.image}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="image" className="mb-4">
+                <Form.Label>Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  name="image"
+                  onChange={handleImageChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.image && errors.image}
+                />
+                {values.image && (
+                  <div className="d-flex align-items-center">
+                    <img
+                      src={values.image}
+                      alt="Selected"
+                      style={{ maxWidth: "200px", marginTop: "10px" }}
+                    />
+                    <FaTimes
+                      className="ml-2"
+                      onClick={handleRemoveImage}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </div>
+                )}
+                {touched.image && errors.image && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.image}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="title" className="mb-4">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                name="title"
-                value={values.title}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched.title && errors.title}
-              />
-              {touched.title && errors.title && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.title}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="title" className="mb-4">
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="title"
+                  value={values.title}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.title && errors.title}
+                />
+                {touched.title && errors.title && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.title}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="department" className="mb-4">
-              <Form.Label>Department</Form.Label>
-              <Form.Control
-                type="text"
-                name="department"
-                value={values.department}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched.department && errors.department}
-              />
-              {touched.department && errors.department && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.department}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="department" className="mb-4">
+                <Form.Label>Department</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="department"
+                  value={values.department}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.department && errors.department}
+                />
+                {touched.department && errors.department && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.department}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="status" className="mb-4">
-              <Form.Label>Status</Form.Label>
-              <Form.Control
-                as="select"
-                name="status"
-                value={values.status}
-                onBlur={handleBlur}
-                onChange={handleChange}
-                isInvalid={touched.status && errors.status}
-              >
-                <option value="">Select status</option>
-                <option value="Active">Active</option>
-                <option value="InActive">InActive</option>
-              </Form.Control>
-              {touched.status && errors.status && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.status}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="status" className="mb-4">
+                <Form.Label>Status</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="status"
+                  value={values.status}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  isInvalid={touched.status && errors.status}
+                >
+                  <option value="">Select status</option>
+                  <option value="Active">Active</option>
+                  <option value="InActive">InActive</option>
+                </Form.Control>
+                {touched.status && errors.status && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.status}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <Form.Group controlId="position" className="mb-4">
-              <Form.Label>Position</Form.Label>
-              <Form.Control
-                type="text"
-                name="position"
-                value={values.position}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched.position && errors.position}
-              />
-              {touched.position && errors.position && (
-                <Form.Control.Feedback type="invalid">
-                  {errors.position}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
+              <Form.Group controlId="position" className="mb-4">
+                <Form.Label>Position</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="position"
+                  value={values.position}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.position && errors.position}
+                />
+                {touched.position && errors.position && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.position}
+                  </Form.Control.Feedback>
+                )}
+              </Form.Group>
 
-            <div className="d-grid">
-              <Button
-                className="mb-4"
-                variant="dark"
-                size="lg"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                Submit
-              </Button>
-            </div>
-          </Form>
-        </Card.Body>
-      </Card>
-    </Container>
+              <div className="d-grid">
+                <Button
+                  className="mb-4"
+                  variant="dark"
+                  size="lg"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </div>
+            </Form>
+          </Card.Body>
+        </Card>
+      </Container>
+    </>
   );
 };
 

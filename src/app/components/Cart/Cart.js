@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Helmet } from "react-helmet-async";
+
 import Title from "../Title";
 import CartColumns from "./CartColumns";
 import EmptyCart from "./EmptyCart";
@@ -11,18 +13,28 @@ const Store = (props) => {
 
   if (cart.length > 0) {
     return (
-      <section>
-        <Title name="your" title="cart" />
-        <CartColumns />
-        <CartList cart={cart} />
-        <CartTotals history={props.history} />
-      </section>
+      <>
+        <Helmet>
+          <title> Dashboard | Cart </title>
+        </Helmet>
+        <section>
+          <Title name="your" title="cart" />
+          <CartColumns />
+          <CartList cart={cart} />
+          <CartTotals history={props.history} />
+        </section>
+      </>
     );
   } else {
     return (
-      <section>
-        <EmptyCart />
-      </section>
+      <>
+        <Helmet>
+          <title> Dashboard | Cart </title>
+        </Helmet>
+        <section>
+          <EmptyCart />
+        </section>
+      </>
     );
   }
 };
