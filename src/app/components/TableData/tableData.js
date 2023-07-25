@@ -7,6 +7,8 @@ import show_Toast from "../../helpers/toast.helper";
 import { Link } from "react-router-dom";
 import { FaTrashAlt, FaPencilAlt } from "react-icons/fa";
 import httpRequest from "../../axios/index";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function TableData() {
   const [tableData, setTableData] = useState([]);
@@ -30,21 +32,44 @@ export default function TableData() {
       });
     }
   };
-  const handleDelete = async (id) => {
-    try {
-      const response = await httpRequest.delete(`/api/auth/deletetable/${id}`);
-      setTableData((prevData) => prevData.filter((item) => item._id !== id));
 
-      show_Toast({
-        status: true,
-        message: response?.data?.message || "Success",
-      });
-    } catch (error) {
-      show_Toast({
-        status: false,
-        message: error?.response?.data?.message || "Something went wrong",
-      });
-    }
+  const handleDelete = (id) => {
+    confirmAlert({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this item?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            try {
+              const response = await httpRequest.delete(
+                `/api/auth/deletetable/${id}`
+              );
+              setTableData((prevData) =>
+                prevData.filter((item) => item._id !== id)
+              );
+
+              show_Toast({
+                status: true,
+                message: response?.data?.message || "Success",
+              });
+            } catch (error) {
+              show_Toast({
+                status: false,
+                message:
+                  error?.response?.data?.message || "Something went wrong",
+              });
+            }
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {
+            // If the user clicks "No", do nothing (cancel the deletion)
+          },
+        },
+      ],
+    });
   };
 
   return (
