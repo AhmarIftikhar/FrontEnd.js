@@ -41,7 +41,7 @@ function LoginForm() {
           "accessToken",
           JSON.stringify(response?.data?.token)
         );
-        navigate("/productList");
+        navigate("/dashboard/product");
       }
       show_Toast({
         status: true,

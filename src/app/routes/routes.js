@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 
 const ProtectRedirectTo = "/";
 
-const AuthRedirectTo = "/productList";
+const AuthRedirectTo = "/dashboard";
 
 // pages access before login
 export const AuthRoute = ({

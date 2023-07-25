@@ -67,7 +67,7 @@ const CreateTableData = () => {
         const response = await Createtabledata(values);
 
         if (response?.data?.success === true) {
-          navigate("/tableData");
+          navigate("/dashboard/tableData");
         }
 
         show_Toast({

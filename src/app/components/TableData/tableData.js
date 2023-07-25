@@ -87,7 +87,7 @@ export default function TableData() {
               <td>{row.position}</td>
               <td>
                 <Link
-                  to={`/editTableData/${row._id}`}
+                  to={`/dashboard/editTableData/${row._id}`}
                   variant="link"
                   size="sm"
                   style={{

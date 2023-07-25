@@ -86,7 +86,7 @@ const EditTableData = () => {
           values
         );
         if (response?.data?.success === true) {
-          navigate("/tableData");
+          navigate("/dashboard/tableData");
         }
         show_Toast({
           status: true,
