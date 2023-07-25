@@ -8,7 +8,7 @@ function HeaderNavbar() {
     <>
       <Navbar bg="light" expand="lg" style={{ paddingBottom: "10px" }}>
         <Container fluid>
-          <Link to="" className="nav-link">
+          <Link to="/" className="nav-link">
             {" "}
             Mobile App{" "}
           </Link>
