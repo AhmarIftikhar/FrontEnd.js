@@ -27,12 +27,12 @@ const Modal = () => {
               <img src={img} className="img-fluid" alt="product" />
               <h5>{title}</h5>
               <h5 className="text-muted">price : $ {price}</h5>
-              <Link to="/productList">
+              <Link to="/dashboard/product">
                 <ButtonContainer onClick={() => dispatch(closeModal())}>
                   continue shopiing
                 </ButtonContainer>
               </Link>
-              <Link to="/cart">
+              <Link to="/dashboard/cart">
                 <ButtonContainer cart onClick={() => dispatch(closeModal())}>
                   go to cart
                 </ButtonContainer>

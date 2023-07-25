@@ -1,23 +1,21 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "../components/app";
 
 import LoginForm from "../containers/auth/login/LoginForm";
 import RegisterForm from "../containers/auth/register/RegisterForm";
-import ProductList from "../components/ProductList";
-import Details from "../components/Details";
-import TableData from "../components/TableData/tableData";
-import CreateTableData from "../components/TableData/createTableData";
-import EditTableData from "../components/TableData/editTableData";
 import Default from "../components/Default";
-import Cart from "../components/Cart/Cart";
 
 import { AuthRoute, ProtectedRoute } from "./routes";
 import Modal from "../components/Modal";
 import ForgotPasswordModel from "../containers/auth/forgotPassword/ForgotPasswordModel";
 import ResetPasswordModal from "../containers/auth/resetPassword/ResetPasswordModal";
 import Home from "../components/Section/Home";
+import DashboardLayout from "../containers/section/dashboard/DashboardLayout";
+import Dashboard from "../containers/section";
+import ProductList from "../components/ProductList";
+import Page404 from "../pages/Page404";
 const AppRoutes = () => {
   const { isAuthenticated = false } = useSelector((state) => state.login);
 
@@ -64,65 +62,17 @@ const AppRoutes = () => {
         />
 
         <Route
-          path="/productList"
+          path="/dashboard/*"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <ProductList />
-              </AppLayout>
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/details"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <Details />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <Cart />{" "}
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/tableData"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <TableData />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/createTableData"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <CreateTableData />{" "}
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/editTableData/:id"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <AppLayout>
-                <EditTableData />{" "}
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/404" element={<Page404 />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
       <Modal />
       <ForgotPasswordModel />

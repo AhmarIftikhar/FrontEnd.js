@@ -21,7 +21,7 @@ const Product = ({ product }) => {
           className="img-container p-5"
           onClick={() => dispatch(handleDetail(id))}
         >
-          <Link to="/details">
+          <Link to="/dashboard/details">
             <img src={img} alt="product" className="card-img-top" />
           </Link>
           <button
